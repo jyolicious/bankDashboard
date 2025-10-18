@@ -1,0 +1,215 @@
+/* --- Global Layout --- */
+.dashboard-wrapper {
+    min-height: 100vh;
+    padding: 20px;
+    /* Simulate the background gradient */
+    background: linear-gradient(to bottom right, #f8fafc, #f1f5f9); 
+}
+
+.dashboard-container {
+    max-width: 1280px; /* Equivalent to max-w-7xl */
+    margin: 0 auto; /* Equivalent to mx-auto */
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Header Styling --- */
+.dashboard-header {
+    margin-bottom: 32px; /* Equivalent to mb-8 */
+}
+
+.header-title {
+    font-size: 24px; /* Equivalent to text-3xl */
+    font-weight: bold;
+    color: #1e293b; /* A dark slate color */
+    margin-bottom: 8px; /* Equivalent to mb-2 */
+}
+
+.header-subtitle {
+    color: #64748b; /* A medium slate color */
+    font-size: 14px; /* Equivalent to text-sm */
+}
+
+/* --- KPI Cards Grid --- */
+.kpi-grid {
+    display: grid;
+    /* Create 4 equal columns */
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 24px; /* Equivalent to gap-6 */
+    margin-bottom: 32px; /* Equivalent to mb-8 */
+}
+
+.kpi-card {
+    background-color: white;
+    border-radius: 12px; /* Equivalent to rounded-xl */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); /* Equivalent to shadow-sm */
+    border: 1px solid #e2e8f0; /* Equivalent to border-slate-200 */
+    padding: 20px; /* Equivalent to p-5 */
+    transition: box-shadow 0.3s ease;
+}
+
+.kpi-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Equivalent to hover:shadow-md */
+}
+
+.kpi-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px; /* Equivalent to mb-3 */
+}
+
+.kpi-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px; /* Equivalent to rounded-lg */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px; /* Equivalent to text-lg */
+    font-weight: bold;
+}
+
+/* Specific KPI Icon Colors (Gradient Simulation) */
+.kpi-icon-blue {
+    background-image: linear-gradient(to bottom right, #3b82f6, #2563eb); /* from-blue-500 to-blue-600 */
+}
+.kpi-icon-green {
+    background-image: linear-gradient(to bottom right, #10b981, #059669); /* from-emerald-500 to-emerald-600 */
+}
+.kpi-icon-purple {
+    background-image: linear-gradient(to bottom right, #8b5cf6, #7c3aed); /* from-purple-500 to-purple-600 */
+}
+.kpi-icon-orange {
+    background-image: linear-gradient(to bottom right, #f97316, #ea580c); /* from-orange-500 to-orange-600 */
+}
+
+.kpi-value {
+    font-size: 24px; /* Equivalent to text-2xl */
+    font-weight: bold;
+    color: #1e293b;
+    margin-bottom: 4px; /* Equivalent to mb-1 */
+}
+
+.kpi-title {
+    font-size: 12px; /* Equivalent to text-xs */
+    font-weight: 500;
+    color: #475569; /* A darker slate color */
+    margin-bottom: 4px; /* Equivalent to mb-1 */
+}
+
+.kpi-subtitle {
+    font-size: 12px; /* Equivalent to text-xs */
+    color: #94a3b8; /* A lighter slate color */
+}
+
+/* --- Charts Grid --- */
+/* ... in Dashboard.css */
+.charts-grid {
+    display: grid;
+    /* This creates 2 equal columns for all charts */
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 24px; 
+    flex-grow: 1; 
+    padding-bottom: 20px; 
+}
+/* ... */
+.chart-container {
+    background-color: white;
+    border-radius: 12px; /* Equivalent to rounded-xl */
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+    padding: 24px; /* Equivalent to p-6 */
+    transition: box-shadow 0.3s ease;
+}
+
+.chart-container:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.chart-title {
+    font-size: 16px; /* Equivalent to text-base */
+    font-weight: 600;
+    color: #334155; /* A slate-700 color */
+    margin-bottom: 16px; /* Equivalent to mb-4 */
+}
+/* --- Add to Dashboard.css --- */
+
+/* Ensures the map chart container has no padding for the map to fill it */
+.map-chart-container {
+    padding: 15px 24px 24px 24px; /* Keep top padding, remove others for map image area */
+}
+
+/* ... other styles in Dashboard.css ... */
+
+/* Map Container Styling */
+.map-container {
+    width: 100%;
+    height: 250px; 
+    position: relative; 
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.map-placeholder {
+    
+    background-image: url('/public/usa.png');
+    /* Increase height to fill more vertical space */
+    height: 230px; 
+    /* Fallback color should be white or very light gray for a clean dashboard look */
+    background-color: white; 
+    /* Ensure the image covers the area completely and is perfectly centered */
+    background-size: cover; /* Use 'cover' to ensure it fills the container */
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+    /* Give it a slight border radius to match the card edges */
+    border-radius: 8px;
+}
+
+/* ... Map Marker and Tooltip styles ... */
+
+/* Map Marker Styling */
+.map-marker {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.8;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: 1px solid white;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+.map-marker:hover {
+    opacity: 1;
+    transform: scale(1.2);
+    z-index: 20;
+}
+
+/* Tooltip Styling */
+.marker-tooltip {
+    position: absolute;
+    bottom: 100%; /* Position above the marker */
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1f2937; /* Dark background */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none; /* Allows clicks to go through to the marker itself */
+    transition: opacity 0.3s ease;
+    z-index: 30;
+    transform: translateX(-50%); 
+    
+    /* Ensure tooltips are readable */
+    text-align: center;
+}
+
+.map-marker:hover .marker-tooltip {
+    opacity: 1;
+}
