@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
+import { BarChart, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
-// SVG Icons as components
 const CalendarIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -67,29 +67,26 @@ const SegmentFinder = () => {
     }));
   };
 
-  // Replace this with your actual API call
   const simulateAPI = async (data) => {
     await new Promise(resolve => setTimeout(resolve, 800));
     
     const totalScore = data.frequency * 2 + (100 - data.recency) + (data.monetary / 10);
     
     if (totalScore > 300) {
-      return { segment_label: 'High-Value Loyal', cluster_id: 'A1' };
+      return { segment_label: 'High-Value Loyal', cluster_id: 'A1', score: totalScore };
     } else if (totalScore > 150) {
-      return { segment_label: 'Mid-Value Growing', cluster_id: 'B2' };
+      return { segment_label: 'Mid-Value Growing', cluster_id: 'B2', score: totalScore };
     } else {
-      return { segment_label: 'Low-Value New', cluster_id: 'C3' };
+      return { segment_label: 'Low-Value New', cluster_id: 'C3', score: totalScore };
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setError('');
     setPrediction(null);
     setLoading(true);
 
     try {
-      // Replace with: const response = await axios.post(API_URL, formData);
       const response = await simulateAPI(formData);
       setPrediction(response);
     } catch (err) {
@@ -100,117 +97,326 @@ const SegmentFinder = () => {
     }
   };
 
-  const renderPrediction = () => {
+  const renderGraphs = () => {
     if (!prediction) return null;
 
     const segment = prediction.segment_label;
-    let cardColor = 'linear-gradient(135deg, #bbdefb 0%, #90caf9 100%)';
+    let segmentColor = '#3f51b5';
     let recommendation = "Analyze spending habits for targeted offers.";
     let Icon = TrendingUpIcon;
-    let accentColor = '#3f51b5';
-    let borderColor = '#3f51b5';
-    let iconBg = '#e3f2fd';
 
     if (segment.includes('High-Value')) {
-      cardColor = 'linear-gradient(135deg, #c8e6c9 0%, #81c784 100%)';
-      accentColor = '#2e7d32';
-      borderColor = '#2e7d32';
-      iconBg = '#e8f5e9';
+      segmentColor = '#2e7d32';
       recommendation = "High-Value Customer: Offer exclusive loyalty programs and premium credit services.";
       Icon = WalletIcon;
     } else if (segment.includes('Mid-Value')) {
-      cardColor = 'linear-gradient(135deg, #fff9c4 0%, #fff59d 100%)';
-      accentColor = '#f57f17';
-      borderColor = '#f57f17';
-      iconBg = '#fffde7';
+      segmentColor = '#f57f17';
       recommendation = "Mid-Value Customer: Encourage increased frequency with targeted product promotions.";
       Icon = AwardIcon;
     } else {
-      cardColor = 'linear-gradient(135deg, #ffcdd2 0%, #ef9a9a 100%)';
-      accentColor = '#c62828';
-      borderColor = '#c62828';
-      iconBg = '#ffebee';
+      segmentColor = '#c62828';
     }
 
+    const rfmData = [
+      {
+        name: 'Recency',
+        score: Math.max(0, 100 - formData.recency),
+        maxScore: 100,
+        fill: '#9dabeaff'
+      },
+      {
+        name: 'Frequency',
+        score: Math.min(formData.frequency * 5, 100),
+        maxScore: 100,
+        fill: '#3b57e4ff'
+      },
+      {
+        name: 'Monetary',
+        score: Math.min((formData.monetary / 10), 100),
+        maxScore: 100,
+        fill: '#250c5aff'
+      }
+    ];
+
+    const radarData = [
+      {
+        metric: 'Recency',
+        value: Math.max(0, 100 - formData.recency),
+        fullMark: 100
+      },
+      {
+        metric: 'Frequency',
+        value: Math.min(formData.frequency * 5, 100),
+        fullMark: 100
+      },
+      {
+        metric: 'Monetary',
+        value: Math.min((formData.monetary / 10), 100),
+        fullMark: 100
+      },
+      {
+        metric: 'Loyalty',
+        value: Math.min(formData.frequency * 3, 100),
+        fullMark: 100
+      },
+      {
+        metric: 'Engagement',
+        value: Math.max(0, 100 - (formData.recency * 2)),
+        fullMark: 100
+      }
+    ];
+
+    const segmentDistribution = [
+      { name: 'High-Value', value: segment.includes('High-Value') ? 35 : 25, color: '#2e7d32' },
+      { name: 'Mid-Value', value: segment.includes('Mid-Value') ? 45 : 35, color: '#f57f17' },
+      { name: 'Low-Value', value: segment.includes('Low-Value') ? 35 : 20, color: '#c62828' },
+      { name: 'Others', value: 20, color: '#9e9e9e' }
+    ];
+
+    const trendData = [
+      { month: 'Jan', value: 20 },
+      { month: 'Feb', value: 35 },
+      { month: 'Mar', value: 45 },
+      { month: 'Apr', value: 55 },
+      { month: 'May', value: Math.min(formData.frequency * 5, 100) },
+      { month: 'Jun', value: Math.min(formData.frequency * 5 + 10, 100) }
+    ];
+
     return (
-      <div style={{
-        marginTop: '32px',
-        background: cardColor,
-        borderRadius: '16px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
-        overflow: 'hidden',
-        borderTop: `6px solid ${borderColor}`,
-        animation: 'fadeIn 0.6s ease-out'
-      }}>
-        <div style={{ padding: '32px' }}>
-          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+      <div style={{ marginTop: '32px', animation: 'fadeIn 0.6s ease-out' }}>
+        <div style={{
+          background: `linear-gradient(135deg, ${segmentColor}15 0%, ${segmentColor}30 100%)`,
+          borderRadius: '20px',
+          padding: '40px',
+          marginBottom: '24px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+          borderLeft: `6px solid ${segmentColor}`
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '20px' }}>
+            <div style={{ flex: 1 }}>
+              <div style={{
+                fontSize: '12px',
+                fontWeight: 700,
+                letterSpacing: '2px',
+                color: segmentColor,
+                marginBottom: '12px'
+              }}>
+                CUSTOMER SEGMENT PREDICTION
+              </div>
+              <h2 style={{
+                fontSize: '2.5rem',
+                fontWeight: 700,
+                color: segmentColor,
+                marginBottom: '16px',
+                margin: '0 0 16px 0'
+              }}>
+                {segment}
+              </h2>
+              <p style={{
+                color: '#666',
+                fontSize: '1rem',
+                lineHeight: '1.6',
+                margin: 0
+              }}>
+                <strong>Cluster:</strong> {prediction.cluster_id} | <strong>Score:</strong> {prediction.score.toFixed(1)}
+              </p>
+            </div>
             <div style={{
-              display: 'inline-flex',
+              display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '80px',
-              height: '80px',
+              width: '100px',
+              height: '100px',
               borderRadius: '50%',
-              background: iconBg,
-              marginBottom: '16px',
-              boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
-              transition: 'transform 0.3s ease',
-              color: accentColor
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            >
+              background: 'white',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+              color: segmentColor
+            }}>
               <Icon />
             </div>
-            <div style={{
-              fontSize: '11px',
-              fontWeight: 700,
-              letterSpacing: '2px',
-              color: accentColor,
-              opacity: 0.8,
-              marginBottom: '8px'
-            }}>
-              PREDICTED SEGMENT
-            </div>
-            <h2 style={{
-              fontSize: '2.5rem',
-              fontWeight: 700,
-              color: accentColor,
-              marginBottom: '16px',
-              textShadow: '0 2px 4px rgba(0,0,0,0.05)'
-            }}>
-              {segment}
-            </h2>
+          </div>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+          gap: '24px',
+          marginBottom: '24px'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '20px',
+            padding: '32px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+          }}>
+            <h3 style={{
+              fontSize: '1.25rem',
+              fontWeight: 600,
+              color: '#333',
+              marginBottom: '24px',
+              margin: '0 0 24px 0'
+            }}>RFM Score Breakdown</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={rfmData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="name" stroke="#666" />
+                <YAxis stroke="#666" />
+                <Tooltip 
+                  contentStyle={{
+                    background: 'white',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                  }}
+                />
+                <Bar dataKey="score" radius={[8, 8, 0, 0]}>
+                  {rfmData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
 
           <div style={{
-            padding: '24px',
-            background: 'rgba(255,255,255,0.7)',
-            borderRadius: '12px',
-            backdropFilter: 'blur(10px)',
-            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
+            background: 'white',
+            borderRadius: '20px',
+            padding: '32px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
           }}>
-            <p style={{
-              fontWeight: 500,
+            <h3 style={{
+              fontSize: '1.25rem',
+              fontWeight: 600,
               color: '#333',
-              lineHeight: '1.8',
-              margin: 0
-            }}>
-              <strong style={{ color: accentColor }}>Marketing Action:</strong> {recommendation}
-            </p>
+              marginBottom: '24px',
+              margin: '0 0 24px 0'
+            }}>Customer Profile Analysis</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <RadarChart data={radarData}>
+                <PolarGrid stroke="#e0e0e0" />
+                <PolarAngleAxis dataKey="metric" stroke="#666" />
+                <PolarRadiusAxis stroke="#666" />
+                <Radar 
+                  name="Customer Score" 
+                  dataKey="value" 
+                  stroke={segmentColor} 
+                  fill={segmentColor} 
+                  fillOpacity={0.6} 
+                />
+                <Tooltip 
+                  contentStyle={{
+                    background: 'white',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                  }}
+                />
+              </RadarChart>
+            </ResponsiveContainer>
           </div>
 
-          <div style={{ textAlign: 'center', marginTop: '24px' }}>
-            <span style={{
-              fontSize: '11px',
+          <div style={{
+            background: 'white',
+            borderRadius: '20px',
+            padding: '32px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+          }}>
+            <h3 style={{
+              fontSize: '1.25rem',
               fontWeight: 600,
-              letterSpacing: '1px',
-              color: accentColor,
-              opacity: 0.7
-            }}>
-              Cluster ID: {prediction.cluster_id}
-            </span>
+              color: '#333',
+              marginBottom: '24px',
+              margin: '0 0 24px 0'
+            }}>Segment Distribution</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={segmentDistribution}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  outerRadius={100}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {segmentDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  contentStyle={{
+                    background: 'white',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
+
+          <div style={{
+            background: 'white',
+            borderRadius: '20px',
+            padding: '32px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+          }}>
+            <h3 style={{
+              fontSize: '1.25rem',
+              fontWeight: 600,
+              color: '#333',
+              marginBottom: '24px',
+              margin: '0 0 24px 0'
+            }}>Engagement Trend</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={trendData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="month" stroke="#666" />
+                <YAxis stroke="#666" />
+                <Tooltip 
+                  contentStyle={{
+                    background: 'white',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                  }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke={segmentColor} 
+                  strokeWidth={3}
+                  dot={{ fill: segmentColor, r: 6 }}
+                  activeDot={{ r: 8 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div style={{
+          background: 'white',
+          borderRadius: '20px',
+          padding: '32px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+          borderTop: `4px solid ${segmentColor}`
+        }}>
+          <h3 style={{
+            fontSize: '1.25rem',
+            fontWeight: 600,
+            color: segmentColor,
+            marginBottom: '16px',
+            margin: '0 0 16px 0'
+          }}>Marketing Action Recommendation</h3>
+          <p style={{
+            fontSize: '1.1rem',
+            color: '#555',
+            lineHeight: '1.8',
+            margin: 0
+          }}>
+            {recommendation}
+          </p>
         </div>
       </div>
     );
@@ -223,7 +429,7 @@ const SegmentFinder = () => {
       padding: '48px 16px'
     }}>
       <div style={{
-        maxWidth: '900px',
+        maxWidth: '1400px',
         margin: '0 auto'
       }}>
         <div style={{
@@ -242,7 +448,8 @@ const SegmentFinder = () => {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-              marginBottom: '8px'
+              marginBottom: '8px',
+              margin: '0 0 8px 0'
             }}>
               Customer Segment Finder
             </h1>
@@ -250,24 +457,24 @@ const SegmentFinder = () => {
               color: '#666',
               fontWeight: 500,
               letterSpacing: '1px',
-              fontSize: '1.125rem'
+              fontSize: '1.125rem',
+              margin: 0
             }}>
-              RFM Analysis & Segmentation
+              Advanced RFM Analysis & Visual Segmentation
             </p>
           </div>
 
-          <form onSubmit={handleSubmit}>
+          <div>
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
               gap: '24px',
               marginBottom: '32px'
             }}>
-              {/* Recency Input */}
               <div style={{
                 background: 'linear-gradient(to bottom right, #f8f9fa, #e9ecef)',
                 borderRadius: '16px',
-                padding: '20px',
+                padding: '24px',
                 transition: 'all 0.3s ease',
                 border: '2px solid transparent'
               }}
@@ -285,7 +492,7 @@ const SegmentFinder = () => {
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', color: '#667eea' }}>
                   <CalendarIcon />
                   <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', color: '#666', marginLeft: '8px' }}>
-                    RECENCY
+                    RECENCY (DAYS)
                   </span>
                 </div>
                 <input
@@ -294,7 +501,6 @@ const SegmentFinder = () => {
                   value={formData.recency}
                   onChange={handleChange}
                   placeholder="Days Since Last Transaction"
-                  required
                   style={{
                     width: '100%',
                     padding: '12px 16px',
@@ -310,11 +516,10 @@ const SegmentFinder = () => {
                 />
               </div>
 
-              {/* Frequency Input */}
               <div style={{
                 background: 'linear-gradient(to bottom right, #f8f9fa, #e9ecef)',
                 borderRadius: '16px',
-                padding: '20px',
+                padding: '24px',
                 transition: 'all 0.3s ease',
                 border: '2px solid transparent'
               }}
@@ -332,7 +537,7 @@ const SegmentFinder = () => {
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', color: '#667eea' }}>
                   <RepeatIcon />
                   <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', color: '#666', marginLeft: '8px' }}>
-                    FREQUENCY
+                    FREQUENCY (COUNT)
                   </span>
                 </div>
                 <input
@@ -341,7 +546,6 @@ const SegmentFinder = () => {
                   value={formData.frequency}
                   onChange={handleChange}
                   placeholder="Total Transactions"
-                  required
                   style={{
                     width: '100%',
                     padding: '12px 16px',
@@ -357,11 +561,10 @@ const SegmentFinder = () => {
                 />
               </div>
 
-              {/* Monetary Input */}
               <div style={{
                 background: 'linear-gradient(to bottom right, #f8f9fa, #e9ecef)',
                 borderRadius: '16px',
-                padding: '20px',
+                padding: '24px',
                 transition: 'all 0.3s ease',
                 border: '2px solid transparent'
               }}
@@ -379,7 +582,7 @@ const SegmentFinder = () => {
                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', color: '#667eea' }}>
                   <DollarIcon />
                   <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', color: '#666', marginLeft: '8px' }}>
-                    MONETARY
+                    MONETARY ($)
                   </span>
                 </div>
                 <input
@@ -388,7 +591,6 @@ const SegmentFinder = () => {
                   value={formData.monetary}
                   onChange={handleChange}
                   placeholder="Average Transaction Amount"
-                  required
                   style={{
                     width: '100%',
                     padding: '12px 16px',
@@ -406,11 +608,11 @@ const SegmentFinder = () => {
             </div>
 
             <button
-              type="submit"
+              onClick={handleSubmit}
               disabled={loading}
               style={{
                 width: '100%',
-                padding: '16px',
+                padding: '18px',
                 fontSize: '1.125rem',
                 fontWeight: 600,
                 color: 'white',
@@ -435,9 +637,9 @@ const SegmentFinder = () => {
                 }
               }}
             >
-              {loading ? 'Analyzing...' : 'Analyze Customer Segment'}
+              {loading ? '🔄 Analyzing Customer Data...' : '📊 Analyze & Visualize Segment'}
             </button>
-          </form>
+          </div>
 
           {error && (
             <div style={{
@@ -450,11 +652,11 @@ const SegmentFinder = () => {
               fontWeight: 500,
               animation: 'fadeIn 0.3s ease-out'
             }}>
-              Error: {error}
+              ⚠️ Error: {error}
             </div>
           )}
 
-          {renderPrediction()}
+          {renderGraphs()}
         </div>
       </div>
 
